@@ -4,6 +4,8 @@ const User = require("../models/users");
 const Otp = require("../models/otpModel");
 const Profile = require("../models/profile");
 const otpGenerator = require("otp-generator");
+const mailSender = require("../utils/mailSender");
+const {passwordUpdated} = require("../mail/templates/passwordUpdate");
 require("dotenv").config();
 
 exports.sendOtp = async function(req, res) 
@@ -113,7 +115,7 @@ exports.signUp = async function(req, res){
             });
         }
 
-        if(otp != recentOtp)
+        if(otp != recentOtp.otp)
         {
             return res.status(400).json({
                 success : false,
@@ -124,7 +126,7 @@ exports.signUp = async function(req, res){
         const hashedPassword = await bcrypt.hash(password, 10);
 
         const profile = await Profile.create({contactNumber});
-        const user = await User.create({firstName, lastName, email, password : hashedPassword, accountType, additionalDetails : profile._id, image : `https://api.dicebear.com/5.x/initials/svg?seed=${firstName} ${lastName}`});
+        const user = await User.create({firstName, lastName, email, password : hashedPassword, accountType, additionalDetails : profile._id, image : `https://api.dicebear.com/5.x/initials/svg?seed=${firstName}+${lastName}`});
 
         return res.status(200).json({
             success : true,
@@ -175,7 +177,10 @@ exports.logIn = async function(req, res)
             })
         }
 
+
+
         const check = await bcrypt.compare(password, user.password);
+
 
         if(!check)
         {
@@ -185,22 +190,30 @@ exports.logIn = async function(req, res)
             });
         }
 
+
         const payload = {
-            accountType,
-            email,
+            accountType : user.accountType,
+            email : user.email,
             id : user._id
         } 
+
+
         const token = jwt.sign(payload, process.env.JWT_SECRET_KEY, {
             expiresIn : "2h",
-
         })
+
 
         user.token = token;
         user.password = undefined;
         
-        
+        const option  = {
+            httpOnly : true, 
+            secure : true, 
+            expires : Date.now() + 3*24*60*60*60*1000
+        }
 
-        return res.cookie("token", token, {httpOnly : true, secure : true, expires : new Date.now() + 3*24*60*60*60*1000}).status(200).json({
+
+        return res.cookie("token", token, ).status(200).json({
             success : true,
             data : user,
             message : "User Logged In successfully"
@@ -210,17 +223,19 @@ exports.logIn = async function(req, res)
     {
         return res.status(500).json({
             success : false,
-            message : "Internal Server Error. Login Failure"
+            message : e.message || "Internal Server Error. Login Failure"
         })
     }
 }
 
-exports.changePassword(req, res)
+exports.changePassword = async function(req, res)
 {
     try
     {
-        const {email} = req.user.email;
+        
+        const email = req.user.email;
         const {oldPassword, newPassword, newConfirmPassword} = req.body;
+        console.log(email, " ", oldPassword, " ", newPassword, " ", newConfirmPassword);
         if(!email || !oldPassword || !newPassword || !newConfirmPassword)
         {
             return res.status(400).json({
@@ -241,7 +256,7 @@ exports.changePassword(req, res)
         const check = await bcrypt.compare(oldPassword, user.password);
         if(!check)
         {
-            return res.send(401).json({
+            return res.status(401).json({
                 success : false,
                 message : "Incorrect Password"
             })
@@ -251,6 +266,17 @@ exports.changePassword(req, res)
 
         user.password = hashedPassword;
         const response = await user.save();
+
+        try
+        {
+            const mailResponse = await mailSender(email, "Password Changed Successfully", passwordUpdated(user.email, user.firstName));
+            console.log("Mail sent successfully");
+        } catch(e)
+        {
+            throw new Error("Error while sending mail");
+        }
+
+        res.clearCookie('token', { httpOnly: true, secure: true });     
         return res.status(200).json({
             success : true,
             message : "Password Changed Successfully"

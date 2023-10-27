@@ -1,4 +1,5 @@
 const mongoose = require("mongoose");
+const SubSection = require("./subSection");
 
 const sectionSchema = new mongoose.Schema({
     sectionName: { 
@@ -11,9 +12,21 @@ const sectionSchema = new mongoose.Schema({
         {
             type : mongoose.Schema.Types.ObjectId,
             ref : "SubSection",
-            required : true
+            // required : true
         }
     ]
+})
+
+sectionSchema.pre("deleteOne", async function(next) {
+    console.log("here");
+    try
+    {
+        await Promise.all(this.subSection.map(async (sub) => await SubSection.findByIdAndRemove(sub)));
+        next();
+    } catch(e)
+    {
+        throw new Error(e.message);
+    }
 })
 
 

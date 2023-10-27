@@ -1,4 +1,6 @@
 const mongoose = require("mongoose");
+const Profile = require("../models/profile");
+const Course = require("../models/course");
 
 const userSchema = mongoose.Schema({
     firstName : {
@@ -51,6 +53,11 @@ const userSchema = mongoose.Schema({
         required : true
     },
 
+    publicId : {
+        type : String,
+        default : null
+    },
+
     courseProgress : [
         {
             type : mongoose.Schema.Types.ObjectId,
@@ -67,5 +74,23 @@ const userSchema = mongoose.Schema({
     }
 })
 
+userSchema.pre("remove", async function(next){
+    try{
+        const profileId = this.additionalDetails;
+        await Profile.findByIdAndRemove(profileId);
+        if(this.accountType === "Instructor")
+        {
+            await Promise.all(this.courses.map(async(course) =>await Course.findByIdAndRemove(course)));
+        }
+        else if(this.accountType === "Student")
+        {
+            await Promise.all(this.courses.map(async(course) => await Course.findByIdAndUpdate(course, {$pull : {students : this._id}})))
+        }
+        next();
+    } catch(e)
+    {
+        throw new Error(e.message);
+    }
+})
 
 module.exports = mongoose.model("User", userSchema);

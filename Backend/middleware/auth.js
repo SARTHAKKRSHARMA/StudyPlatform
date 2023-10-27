@@ -1,6 +1,31 @@
 const jwt = require("jsonwebtoken");
 require("dotenv").config();
 
+
+exports.isNotAuthenticated = async function(req, res, next)
+{
+    try
+    {
+        const token = req.cookies.token || req.body.token || req.header("Authorization").replace("Bearer ", "");
+        if(!token)
+        {
+            next();
+        }
+        else
+        {
+            const payload = jwt.verify(token, process.env.JWT_SECRET_KEY);
+            return res.status(400).json({
+                success: false,
+                message: "You are already authenticated. Kindly logout first"
+            })
+            
+        }
+    } catch(e)
+    {
+        next();
+    }
+}
+
 exports.isAuthenticated = async function(req, res, next) {
     try
     {
@@ -13,7 +38,6 @@ exports.isAuthenticated = async function(req, res, next) {
             });
         }
 
-        
         jwt.verify(token, process.env.JWT_SECRET_KEY, (err, payload) => {
             if(err){
                 return res.status(401).json({

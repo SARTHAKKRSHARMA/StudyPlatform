@@ -1,4 +1,6 @@
 const mongoose = require("mongoose");
+const User = require("./users");
+const Section = require("./section")
 
 const courseSchema = new mongoose.Schema({
     courseName : {
@@ -48,18 +50,41 @@ const courseSchema = new mongoose.Schema({
         required : true
     },
 
-    tags : [{
+    category : {
         type : mongoose.Schema.Types.ObjectId,
-        ref : "Tag",
+        ref : "Category",
+        required : true
+    },
+
+    tags : [{
+        type : String,
         required : true
     }],
 
     students : [{
         type : mongoose.Schema.Types.ObjectId,
         ref : "User",
-        required : true
-    }]
+    }],
 
+    status : {
+        type : String,
+        enum : ["Draft", "Waiting For Approval", "Published"],
+        default : "Draft"
+    }
+
+})
+
+
+courseSchema.pre("remove", async function(next) {
+    try
+    {
+        await Promise.all(this.students.map(async (student) => await User.findByIdAndUpdate(student, {$pull : {courses : this._id}})))
+        await Promise.all(this.courseContent.map(async (section) => await Section.findByIdAndRemove(section)))
+        next();
+    } catch(e)
+    {
+        throw new Error(e.message);
+    }
 })
 
 module.exports = mongoose.model("Course", courseSchema);

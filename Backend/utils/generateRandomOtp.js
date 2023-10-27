@@ -1,7 +1,7 @@
 const crypto = require("crypto");
 
 function generateRandom() {
-  return crypto.randomUUID();
+  return crypto.randomUUID({disableEntropyCache : true});
 }
   
   // Generate a random 6-digit numerical OTP based on a hashed value of Date.now(
