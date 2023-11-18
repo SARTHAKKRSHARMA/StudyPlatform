@@ -139,7 +139,7 @@ exports.signUp = async function(req, res){
         console.log(e.message);
         return res.status(500).json({
             success:false,
-            error : "Internal Server Error"
+            message : "Internal Server Error"
         });
     }
 }
@@ -288,6 +288,44 @@ exports.changePassword = async function(req, res)
             success:false,
             message : "Internal Server Error"
         })
+    }
+}
+
+exports.getUserFromToken = async function(req, res){
+
+    const id = req.user.id;
+
+    if(!id)
+    {
+        return res.status(401).json({
+            success : false,
+            message : "Unauthorized Access Denied",
+        })
+    }
+
+    try
+    {
+        const user = await User.findById(id);
+        if(!user)
+        {
+            return res.status(404).json({
+                success : false,
+                message : "No such user found"
+            })
+        }
+        user.password = undefined;
+        user.token = req.token;
+        return res.status(200).json({
+            success : true,
+            data : user
+        })
+    } catch(e)
+    {
+        console.log("error ", e.message);
+        return res.status(500).json({
+            success : false,
+            message : "Server error occured"
+        })        
     }
 }
 

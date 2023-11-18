@@ -40,7 +40,7 @@ exports.isAuthenticated = async function(req, res, next) {
 
         jwt.verify(token, process.env.JWT_SECRET_KEY, (err, payload) => {
             if(err){
-                return res.status(401).json({
+                return res.status(403).json({
                     success : false,
                     message : "Token verification Failed"
                 })
