@@ -100,6 +100,7 @@ export const login = (email, password, navigate) => {
             dispatch(setToken(response?.data?.data?.token));
             dispatch(setUser(response?.data?.data)); 
             localStorage.setItem("token", JSON.stringify(response.data.data.token))
+            localStorage.setItem("user", JSON.stringify(response.data.data))
             navigate("/dashboard/my-profile");
         } catch(e)
         {

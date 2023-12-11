@@ -27,7 +27,10 @@ export const course = {
     GET_FULL_COURSE_DETAILS_API : BASE_URL + "/course/getFullCourseDetails",
 }
 
-
+export const profile = {
+    GET_PROFILE : BASE_URL + "/profile/getUserDetails",
+    GET_ENROLLED_COURSES : BASE_URL + "/profile/enrolledCourses"
+}
 
 export const authentication = {
     SIGN_UP_API : BASE_URL + "/auth/signup",
@@ -37,5 +40,9 @@ export const authentication = {
     RESET_PASSWORD_TOKEN_API : BASE_URL + "/auth/reset-password-token",
     RESET_PASSWORD_API : BASE_URL + "/auth/reset-password",
     GET_USER_FROM_TOKEN : BASE_URL + "/auth/getUserFromToken"
+}
+
+export const contactUs = {
+    CONTACTUS_API: BASE_URL + '/contact/contactUs'
 }
 

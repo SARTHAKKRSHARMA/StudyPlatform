@@ -10,6 +10,10 @@ import ForgotPassword from "./pages/ForgotPassword";
 import UpdatePassword from "./pages/updatePassword";
 import VerifyEmail from "./pages/VerifyEmail";
 import About from "./pages/About";
+import Dashboard from "./pages/Dashboard";
+import MyProfile from "./components/core/dashboard/MyProfile";
+import PrivateRoute from "./components/core/authentication/PrivateRoute";
+import EnrolledCourses from "./components/core/dashboard/EnrolledCourses";
 
 function App() {
   return (
@@ -24,6 +28,17 @@ function App() {
         <Route path="/update-password/:resetPasswordToken" element={<OpenRoute><UpdatePassword /></OpenRoute> } />
         <Route path="/verification-email" element={<VerifyEmail />} />
         <Route path="/about" element={<About />} />
+        <Route path="/dashboard" element={<div className=" text-white">Not Found</div>} />
+        <Route path="/dashboard" element={<PrivateRoute> <Dashboard /></PrivateRoute>} >
+          <Route path="/dashboard/my-profile" index element={<MyProfile />}/>
+          <Route path="/dashboard/instructor" element={<div className=" text-white">Instructor</div>}/>
+          <Route path="/dashboard/my-courses" element={<div className=" text-white">My Courses</div>}/>
+          <Route path="/dashboard/add-course" element={<div className=" text-white">Add Course</div>}/>
+          <Route path="/dashboard/enrolled-courses" element={<EnrolledCourses />}/>
+          <Route path="/dashboard/purchase-history" element={<div className=" text-white">Purchase History</div>}/>
+          <Route path="/dashboard/settings" element={<div className=" text-white">Settings</div>}/>
+          <Route path="/dashboard/cart" element={<div className=" text-white">Cart</div>}/>
+        </Route>
       </Routes>
     </div>
   );

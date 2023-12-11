@@ -21,8 +21,6 @@ const Navbar = () => {
   const navigate = useNavigate();
   const dispatch = useDispatch();
 
-  if(token && !user) dispatch(getUserFromToken(navigate));
-
 
   const matchRoute = (route) => {
       return matchPath(route, location.pathname);

@@ -6,6 +6,7 @@ import aboutUs3 from "../assets/Images/aboutus3.webp"
 import { FaQuoteLeft, FaQuoteRight } from 'react-icons/fa'
 import foundingStory from "../assets/Images/FoundingStory.png"
 import LearningGrid from '../components/core/about/LearningGrid'
+import ContactForm from '../components/core/about/ContactForm'
 
 
 const About = () => {
@@ -91,6 +92,7 @@ const About = () => {
         {/* section5 */}
         <div className=' mt-10'>
             <LearningGrid />
+            <ContactForm />
         </div>
 
     
