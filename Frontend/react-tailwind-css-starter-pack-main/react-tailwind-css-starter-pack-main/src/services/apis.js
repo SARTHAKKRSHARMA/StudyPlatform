@@ -25,7 +25,7 @@ export const course = {
     COURSE_CATEGORIES_API: BASE_URL + "/course/showAllCategories",
     CREATE_COURSE_API: BASE_URL + "/course/createCourse",
     CREATE_SECTION_API: BASE_URL + "/course/addSection",
-    CREATE_SUBSECTION_API: BASE_URL + "/course/createSubcection",
+    CREATE_SUBSECTION_API: BASE_URL + "/course/createSubsection",
     UPDATE_SECTION_API: BASE_URL + "/course/updateSection",
     UPDATE_SUBSECTION_API: BASE_URL + "/course/updateSubsection",
     GET_ALL_INSTRUCTOR_COURSES_API: BASE_URL + "/course/getInstructorCourses",
@@ -36,7 +36,8 @@ export const course = {
       BASE_URL + "/course/getFullCourseDetails",
     LECTURE_COMPLETION_API: BASE_URL + "/course/updateCourseProgress",
     CREATE_RATING_API: BASE_URL + "/course/createRating",
-    GET_AVERAGE_RATING_API : BASE_URL + "/course/getAverageRating"
+    GET_AVERAGE_RATING_API : BASE_URL + "/course/getAverageRating",
+    PUBLISH_COURSE_API : BASE_URL + "/course/publishCourse"
   }
 
 

@@ -19,6 +19,7 @@ const { GET_AVERAGE_RATING_API,
     GET_FULL_COURSE_DETAILS_AUTHENTICATED,
     LECTURE_COMPLETION_API,
     CREATE_RATING_API,
+    PUBLISH_COURSE_API
      } = course;
 
 
@@ -128,6 +129,29 @@ export const getAllCourses = async () => {
       result = response?.data?.data
     } catch (error) {
       console.log("CREATE COURSE API ERROR............", error)
+      toast.error(error.message)
+    }
+    toast.dismiss(toastId)
+    return result
+  }
+
+  //Publish Course
+  export const publishCourse = async (data, token) => {
+    let result = null
+    const toastId = toast.loading("Loading...")
+    try {
+      const response = await apiConnector("POST", PUBLISH_COURSE_API, data, {
+        Authorization: `Bearer ${token}`,
+      })
+
+      console.log("PUBLISHING API RESPONSE............", response)
+      if (!response?.data?.success) {
+        throw new Error("Could Not Publish Course")
+      }
+      toast.success("Course Published Successfully")
+      result = response?.data?.data
+    } catch (error) {
+      console.log("Publish COURSE API ERROR............", error)
       toast.error(error.message)
     }
     toast.dismiss(toastId)
@@ -294,7 +318,7 @@ export const getAllCourses = async () => {
     const toastId = toast.loading("Loading...")
     try {
       const response = await apiConnector(
-        "GET",
+        "POST",
         GET_ALL_INSTRUCTOR_COURSES_API,
         null,
         {

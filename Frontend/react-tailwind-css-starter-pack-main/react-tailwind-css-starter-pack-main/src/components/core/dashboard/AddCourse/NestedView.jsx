@@ -78,8 +78,8 @@ const NestedView = ({handleChangeEditSectionName}) => {
                                 {
                                     section.subSection.map((subsection, index) => {
                                         return (
-                                            <div key={subsection._id} onClick={() => setViewSubSection(subsection)} className=' flex flex-row items-center justify-between border-b-[1px] border-b-richblack-400 py-3'>
-                                                <div className=' flex flex-row items-center gap-2'>
+                                            <div key={subsection._id}  className=' flex flex-row items-center justify-between border-b-[1px] border-b-richblack-400 py-3 w-full'>
+                                                <div onClick={() => setViewSubSection({...subsection})} className=' flex flex-row items-center gap-2'>
                                                     <RxDropdownMenu className=' cursor-pointer' />
                                                     <p className=' cursor-pointer'>{subsection.title}</p>
                                                 </div>
@@ -91,7 +91,7 @@ const NestedView = ({handleChangeEditSectionName}) => {
                                         )
                                     })
                                 }
-                                <button onClick={() => setAddSubSection(section._id)} className=' text-yellow-100 font-bold flex flex-row items-center gap-[1px]'><MdAdd /> <span>Add Lecture</span></button>
+                                <button onClick={() => setAddSubSection({sectionId : section._id})} className=' text-yellow-100 font-bold flex flex-row items-center gap-[1px]'><MdAdd /> <span>Add Lecture</span></button>
                             </div>
                         </details>
                     )         
