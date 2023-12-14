@@ -6,7 +6,7 @@ const ConfirmationModal = ({modalData}) => {
   return (
     <div>
       <div onClick={modalData.btn2.action} className=' fixed top-0 left-0 w-screen h-screen bg-richblack-900 bg-opacity-50 backdrop-blur-[4px]'></div>
-      <div   className=' w-[350px] h-[150px] bg-richblack-800 fixed top-[50%] left-[50%] -translate-x-[50%] -translate-y-[50%] rounded-md py-4 px-5 flex flex-col gap-4'>
+      <div   className=' w-[350px] h-fit bg-richblack-800 fixed top-[50%] left-[50%] -translate-x-[50%] -translate-y-[50%] rounded-md py-4 px-5 flex flex-col gap-4'>
         <p className=' text-white font-bold text-lg'>{modalData.text1}</p>
         <p className=' text-richblack-200'>{modalData.text2}</p>
         {

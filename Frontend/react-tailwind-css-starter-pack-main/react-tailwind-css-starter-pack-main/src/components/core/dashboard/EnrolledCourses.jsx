@@ -21,7 +21,7 @@ const EnrolledCourses = () => {
     useEffect(() => {
         const getEnrolledCoursesFun = async (token, setLoading) => {
             const response = await getEnrolledCourses(token, setLoading);
-            if(response?.logout) dispatch(logout); 
+            if(response?.data?.logOut) dispatch(logout); 
             if(response?.success) 
             {
                 setEnrolledCourses(response?.data);

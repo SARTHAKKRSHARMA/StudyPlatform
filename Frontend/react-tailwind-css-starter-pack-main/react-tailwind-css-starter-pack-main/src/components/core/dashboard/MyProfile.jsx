@@ -3,6 +3,7 @@ import { useDispatch, useSelector } from 'react-redux'
 import { useNavigate } from 'react-router-dom';
 import { LiaEditSolid } from "react-icons/lia";
 import { getProfile } from '../../../services/operations/profile';
+import { setStep } from '../../../slices/courseSlice';
 
 const MyProfile = () => {
     const {user} = useSelector((state) => state.profile);

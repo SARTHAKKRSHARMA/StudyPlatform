@@ -19,18 +19,34 @@ export const subsection = {
 }
 
 export const course = {
-    CREATE_COURSE_API : BASE_URL + "/course/createCourse",
-    UPDATE_COURSE_API : BASE_URL + "/course/editCourse",
-    DELETE_COURSE_API : BASE_URL + "/course/deleteSubSection",
-    GET_ALL_COURSE_API : BASE_URL + "/course/getAllCourses",
-    GET_COURSE_DETAILS_API : BASE_URL + "/course/getCourseDetails",
-    GET_FULL_COURSE_DETAILS_API : BASE_URL + "/course/getFullCourseDetails",
-}
+    GET_ALL_COURSE_API: BASE_URL + "/course/getAllCourses",
+    COURSE_DETAILS_API: BASE_URL + "/course/getCourseDetails",
+    EDIT_COURSE_API: BASE_URL + "/course/editCourse",
+    COURSE_CATEGORIES_API: BASE_URL + "/course/showAllCategories",
+    CREATE_COURSE_API: BASE_URL + "/course/createCourse",
+    CREATE_SECTION_API: BASE_URL + "/course/addSection",
+    CREATE_SUBSECTION_API: BASE_URL + "/course/createSubcection",
+    UPDATE_SECTION_API: BASE_URL + "/course/updateSection",
+    UPDATE_SUBSECTION_API: BASE_URL + "/course/updateSubsection",
+    GET_ALL_INSTRUCTOR_COURSES_API: BASE_URL + "/course/getInstructorCourses",
+    DELETE_SECTION_API: BASE_URL + "/course/deleteSection",
+    DELETE_SUBSECTION_API: BASE_URL + "/course/deleteSubsection",
+    DELETE_COURSE_API: BASE_URL + "/course/deleteCourse",
+    GET_FULL_COURSE_DETAILS_AUTHENTICATED:
+      BASE_URL + "/course/getFullCourseDetails",
+    LECTURE_COMPLETION_API: BASE_URL + "/course/updateCourseProgress",
+    CREATE_RATING_API: BASE_URL + "/course/createRating",
+    GET_AVERAGE_RATING_API : BASE_URL + "/course/getAverageRating"
+  }
+
+
+  
 
 export const profile = {
     GET_PROFILE : BASE_URL + "/profile/getUserDetails",
     GET_ENROLLED_COURSES : BASE_URL + "/profile/enrolledCourses"
 }
+
 
 export const authentication = {
     SIGN_UP_API : BASE_URL + "/auth/signup",
