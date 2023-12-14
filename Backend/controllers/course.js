@@ -278,12 +278,13 @@ exports.getInstructorCourses = async function(req, res)
 {
     try
     {
-        const {userId} = req.user;
-        const course = await User.findById(userId).populate("courses").exec();
+        const {id:userId} = req.user;
+        console.log(userId);
+        const user = await User.findById(userId).populate("courses").exec();
         return res.status(200).json({
             success : true,
             message : "Course Fetched Successfully",
-            data : course.courses
+            data : user.courses
         })
     } catch(e)
     {
@@ -292,6 +293,57 @@ exports.getInstructorCourses = async function(req, res)
             success : false,
             message : "Error occured while fetching course",
             error : e.message || "Internal Server Error"
+        })
+    }
+}
+
+exports.publishCourse = async function(req, res)
+{
+    try
+    {
+        const {courseId} = req.body;
+        if(!courseId)
+        {
+            return res.stats(400).json({
+                success:false,
+                message:"Please provide the valid information."
+            })
+        }
+
+        const course = await Course.findById(courseId);
+        if(!course)
+        {
+            return res.status(401).json({
+                success : false,
+                message : "Invalid Course ID!"
+            })
+        }
+
+        if(!course.instructor.equals(req.user.id))
+        {
+            return res.status(402).json({
+                success : false,
+                message : "You are not authorized to perform this action!"
+            })
+        }
+
+        course.status = "Published";
+        await course.save();
+        const updatedCourse = await Course.findById(courseId).populate({
+            path : "courseContent",
+            populate : {path : "subSection"}
+        }).exec();
+
+        return res.status(200).json({
+            success : true,
+            data : updatedCourse,
+        })
+    } catch(e)
+    {
+        console.log(e);
+        return res.status(500).json({
+            succes : false,
+            message : e.message || 'Server Error!'
         })
     }
 }

@@ -11,7 +11,12 @@ exports.createSubSection = async function(req, res)
     {
         const {lecture} = req.files;
         const {title, description, sectionId, courseId} = req.body;
-        if(!lecture || !title || !description || !sectionId || courseId)
+        console.log(lecture);
+        console.log(title);
+        console.log(description);
+        console.log(sectionId);
+        console.log(courseId);
+        if(!lecture || !title || !description || !sectionId || !courseId)
         {
             return res.status(400).json({
                 success: false,
@@ -76,7 +81,7 @@ exports.updateSubSection = async function(req, res)
     {
         const {lecture} = req.files;
         const {subSectionId, sectionId, courseId, title, description} = req.body;
-        if(!lecture || !title || !description || !sectionId || courseId)
+        if(!lecture || !title || !description || !sectionId || !courseId)
         {
             return res.status(400).json({
                 success: false,
@@ -117,14 +122,12 @@ exports.updateSubSection = async function(req, res)
         subSection.videoUrl = response.secure_url;
         subSection.publicId = response.public_id;
 
+        await subSection.save();
+
         const updatedCouse = await Course.findById(courseId).populate({
             path : "courseContent",
             populate : {path : "subSection"}
         }).exec()
-
-
-
-        await subSection.save();
 
         return res.status(200).json({
             success: true,
@@ -146,7 +149,7 @@ exports.deleteSubSection = async function(req, res)
     try
     {
         const {subSectionId, sectionId, courseId} = req.body;
-        if(!subSectionId || !sectionId || courseId)
+        if(!subSectionId || !sectionId || !courseId)
         {
             return res.status(400).json({
                 success: false,
