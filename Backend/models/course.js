@@ -12,10 +12,14 @@ const courseSchema = new mongoose.Schema({
 
     courseDescription : {
         type : String, 
-        trime : true,
+        trim : true,
         maxLength : 1500,
         required : true
     },
+
+    requirements : [{
+        type : String
+    }],
 
     instructor : {
         type : mongoose.Schema.Types.ObjectId,

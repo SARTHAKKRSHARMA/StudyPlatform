@@ -1,5 +1,6 @@
 const Section = require("../models/section");
 const SubSection = require("../models/subSection");
+const Course = require("../models/course")
 const {imageUploader} = require("../utils/uploadImage");
 const {isFileIdentical} = require("../utils/identicalFileCheck");
 const {contentDestroyer} = require("../utils/uploadImage");
@@ -9,13 +10,30 @@ exports.createSubSection = async function(req, res)
     try
     {
         const {lecture} = req.files;
-        const {title, description, timeDuration, sectionId} = req.body;
-        if(!lecture || !title || !description || !timeDuration || !sectionId)
+        const {title, description, sectionId, courseId} = req.body;
+        if(!lecture || !title || !description || !sectionId || courseId)
         {
             return res.status(400).json({
                 success: false,
                 message: "Please provide all the required fields"
             });
+        }
+
+        const course = await Course.findById(courseId);
+        if(!course)
+        {
+            return res.status(404).json({
+                success : false,
+                data : "Course Id is not valid"
+            })
+        }
+
+        if(!course.instructor.equals(req.user.id))
+        {
+            return res.status(402).json({
+                success : false,
+                data : "Unauthorized"
+            })
         }
 
         const section = await Section.findById(sectionId);
@@ -28,15 +46,19 @@ exports.createSubSection = async function(req, res)
         }
 
         const response = await imageUploader(lecture.tempFilePath, "/StudyPlatform/Course/Content/");
-        const subSection = await SubSection.create({title, timeDuration, description, videoUrl : response.secure_url, publicId : response.public_id});
+        const subSection = await SubSection.create({title, description, videoUrl : response.secure_url, publicId : response.public_id});
         section.subSection.push(subSection._id);
         await section.save();
 
-        const populatedSection = await section.populate("subSection");
+        const updatedCouse = await Course.findById(courseId).populate({
+            path : "courseContent",
+            populate : {path : "subSection"}
+        }).exec()
+
         return res.status(200).json({
             success: true,
             message : "Subsection Created Successfully",
-            data : populatedSection
+            data : updatedCouse
         })
     } catch(e)
     {
@@ -53,7 +75,32 @@ exports.updateSubSection = async function(req, res)
     try
     {
         const {lecture} = req.files;
-        const {subSectionId, title, timeDuration, description} = req.body;
+        const {subSectionId, sectionId, courseId, title, description} = req.body;
+        if(!lecture || !title || !description || !sectionId || courseId)
+        {
+            return res.status(400).json({
+                success: false,
+                message: "Please provide all the required fields"
+            });
+        }
+
+        const course = await Course.findById(courseId);
+        if(!course)
+        {
+            return res.status(404).json({
+                success : false,
+                data : "Course Id is not valid"
+            })
+        }
+
+        if(!course.instructor.equals(req.user.id))
+        {
+            return res.status(402).json({
+                success : false,
+                data : "Unauthorized"
+            })
+        }
+
         const subSection = await SubSection.findById(subSectionId);
         if(!subSection)
         {
@@ -63,25 +110,25 @@ exports.updateSubSection = async function(req, res)
             });
         }
 
+        const response = await imageUploader(lecture.tempFilePath, "/StudyPlatform/Course/Content/");
 
-        if(!lecture)
-        {
-            Object.assign(subSection, {title, timeDuration, description});
-        }
-        else
-        {
-            console.log("here");
-        
-            await contentDestroyer(subSection.publicId);
-            const response = await imageUploader(lecture.tempFilePath, "/StudyPlatform/Course/Content/");
-            Object.assign(subSection, {title, timeDuration, description, videoUrl : response.secure_url, publicId : response.publicId});
-        }
+        subSection.title = title;
+        subSection.description = description;
+        subSection.videoUrl = response.secure_url;
+        subSection.publicId = response.public_id;
+
+        const updatedCouse = await Course.findById(courseId).populate({
+            path : "courseContent",
+            populate : {path : "subSection"}
+        }).exec()
+
+
 
         await subSection.save();
 
         return res.status(200).json({
             success: true,
-            data: subSection,
+            data: updatedCouse,
             message: "Updated Successfully!"
         })
     } catch(e)
@@ -98,8 +145,8 @@ exports.deleteSubSection = async function(req, res)
 {
     try
     {
-        const {subSectionId, sectionId} = req.body;
-        if(!subSectionId || !sectionId)
+        const {subSectionId, sectionId, courseId} = req.body;
+        if(!subSectionId || !sectionId || courseId)
         {
             return res.status(400).json({
                 success: false,
@@ -107,6 +154,22 @@ exports.deleteSubSection = async function(req, res)
             });
         }
 
+        const course = await Course.findById(courseId);
+        if(!course)
+        {
+            return res.status(404).json({
+                success : false,
+                data : "Course Id is not valid"
+            })
+        }
+
+        if(!course.instructor.equals(req.user.id))
+        {
+            return res.status(402).json({
+                success : false,
+                data : "Unauthorized"
+            })
+        }
         const section = await Section.findById(sectionId);
         if(!section)
         {
@@ -116,7 +179,7 @@ exports.deleteSubSection = async function(req, res)
             })
         }
         
-        const subSection = await SubSection.findById(subSectionId);
+        const subSection = await SubSection.findByIdAndDelete(subSectionId);
         if(!subSection)
         {
             return res.status(404).json({
@@ -125,14 +188,18 @@ exports.deleteSubSection = async function(req, res)
             })
         }
 
-        await subSection.remove();
         section.subSection.pull(subSectionId);
         await section.save();
+
+        const updatedCouse = await Course.findById(courseId).populate({
+            path : "courseContent",
+            populate : {path : "subSection"}
+        }).exec()
 
         return res.status(200).json({
             success: true,
             message : "Deleted Successfully!",
-            data : section
+            data : updatedCouse
         });
     } catch(e)
     {

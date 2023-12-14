@@ -1,3 +1,4 @@
+const course = require("../models/course");
 const Course = require("../models/course");
 const Section = require("../models/section");
 const SubSection = require("../models/subSection");
@@ -22,6 +23,14 @@ exports.createSection = async function(req, res)
                 success : false,
                 error : "Course not found"
             });
+        }
+
+        if(!course.instructor.equals(req.user.id))
+        {
+            return res.status(402).json({
+                success : false,
+                error : "User is not authorized to create this resource"
+            })
         }
 
         const section = await Section.create({sectionName});
@@ -53,8 +62,8 @@ exports.updateSection = async function(req, res)
 {
     try
     {
-        const {sectionId, sectionName} = req.body;
-        if(!sectionId || !sectionName)
+        const {sectionId, sectionName, courseId} = req.body;
+        if(!sectionId || !sectionName || !courseId)
         {
             return res.status(400).json({
                 error : "Please provide all required fields",
@@ -62,11 +71,34 @@ exports.updateSection = async function(req, res)
             })
         }
 
+        const course = await Course.findById(courseId);
+        if(!course)
+        {
+            return res.status(404).json({
+                success:false,
+                message : "No such course exists"
+            })
+        }
+
+        if(!course.instructor.equals(req.user.id))
+        {
+            return res.status(402).json({
+                success : false,
+                message : "Unauthorized"
+            })
+        }
+
         const updatedSection = await Section.findByIdAndUpdate(sectionId, {sectionName}, {new : true});
+        const populatedCourse = await Course.findById(courseId).populate(
+            {
+                path : "courseContent",
+                populate : {path : "subSection"}
+            }).exec();
+
         return res.status(200).json({
             success : true,
             message : "Section Updated Successfully",
-            data : updatedSection
+            data : populatedCourse
         })
     } catch(e)
     {
@@ -93,14 +125,34 @@ exports.deleteSection = async function(req, res)
             })
         }
 
-        const section = await Section.findById(sectionId);
-        await section.deleteOne();
+        console.log("We reached till here");
+        const course = await Course.findById(courseId);
+        if(!course) 
+        {
+            return res.status(404).json({
+                success:false,
+                message:"Invalid Course ID"
+            })
+        }
 
-        const updatedCourse = await Course.findByIdAndUpdate(courseId, {$pull : {"courseContent" : sectionId}}, {new : true});
+        if(!course.instructor.equals(req.user.id))
+        {
+            return res.status(402).json({
+                success : false,
+                message : "Unauthorized Access"
+            })
+        }
+
+        const section = await Section.findByIdAndDelete(sectionId);
+
+        const updatedCourse = await Course.findByIdAndUpdate(courseId, {$pull : {"courseContent" : sectionId}}, {new : true}).populate({
+            path : "courseContent",
+            populate : {path : "subSection"}
+        }).exec();
 
         return res.status(200).json({
             success : true,
-            message : "Section Deleted Successfully and all subsection related with it",
+            message : "Section Deleted Successfully",
             data : updatedCourse
         })
     } catch (e)

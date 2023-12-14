@@ -27,9 +27,11 @@ exports.isNotAuthenticated = async function(req, res, next)
 }
 
 exports.isAuthenticated = async function(req, res, next) {
+    
     try
     {
-        const token = req.cookies.token || req.body.token || req.header["Authorization"].replace("Bearer ", "");
+        console.log(req.body)
+        const token = req.cookies.token || req.body.token || req.header("Authorization").replace("Bearer ", "");
         if(!token)
         {
             return res.status(401).json({
@@ -45,18 +47,18 @@ exports.isAuthenticated = async function(req, res, next) {
                     message : "Token verification Failed"
                 })
             }
-
             req.user = payload;
-            next();
+            next();    
         });
-
     } catch(e)
     {
+        console.log(e);
         return res.status(500).json({
             success : false,
+            logOut : true, 
             error   : e.message,
             message : "Token verification failed."
-        });
+        }); 
     }
 }
 

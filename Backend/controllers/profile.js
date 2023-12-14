@@ -71,6 +71,7 @@ exports.getAllUserDetails = async function(req, res)
 
         const user = await User.findById(id).populate("additionalDetails").exec();
 
+
         return res.status(200).json({
             success : true,
             data : user,
@@ -129,8 +130,8 @@ exports.getEnrolledCourses = async function(req, res)
 {
     try
     {
-        const usedId = req.user.id;
-        if (!usedId)
+        const userId = req.user.id;
+        if (!userId)
         {
             return res.status(401).json({
                 success : false,
@@ -138,7 +139,7 @@ exports.getEnrolledCourses = async function(req, res)
             })
         }
 
-        const user = await User.findById(userId).populate("coureses");
+        const user = await User.findById(userId).populate("courses");
         if (!user)
         {
             return res.status(404).json({
@@ -155,7 +156,7 @@ exports.getEnrolledCourses = async function(req, res)
     {
         return res.status(500).json({
             success: false,
-            message: error.message,
+            message: e.message,
           })
     }
 }
