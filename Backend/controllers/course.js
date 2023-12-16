@@ -167,7 +167,12 @@ exports.editCourse = async function(req, res)
             })
         }
 
-        const course = await Course.findById(courseId);
+        const course = await Course.findById(courseId).populate({
+            path : "courseContent",
+            populate : {
+                path : "subSection"
+            }
+        });
         if(!course)
         {
             return res.status(401).json({
@@ -240,7 +245,9 @@ exports.deleteCourse = async function(req, res)
 
         
         const course = await Course.findById(courseId);
-        if(!course)
+        const category = await Categories.findById(course.category);
+
+        if(!course || !category)
         {
             return res.status(401).json({
                 success : false,
@@ -248,7 +255,7 @@ exports.deleteCourse = async function(req, res)
             })
         }
 
-        if(course.instructor !== req.user.id)
+        if(!course.instructor.equals(req.user.id))
         {
             return res.status(402).json({
                 success : false,
@@ -258,10 +265,23 @@ exports.deleteCourse = async function(req, res)
 
 
         await Course.findByIdAndDelete(courseId);
+        category.courses.pull(course._id);
+        await category.save();
+        const user = await User.findByIdAndUpdate(req.user.id, {$pull : {courses : courseId}}).populate({
+            path : "courses",
+            populate : {
+                path : "courseContent",
+                populate : {
+                    path : "subSection"
+                }
+            }
+        }).exec();
 
+        console.log(user.courses);
         return res.status(200).json({
             success : true,
             message : "Course Deleted Successfully",
+            data : user.courses
         })
     } catch(e)
     {
@@ -280,7 +300,13 @@ exports.getInstructorCourses = async function(req, res)
     {
         const {id:userId} = req.user;
         console.log(userId);
-        const user = await User.findById(userId).populate("courses").exec();
+        const user = await User.findById(userId).populate({
+            path : "courses",
+            populate : {
+                path : "courseContent",
+                populate : {path : "subSection"}
+            }
+        }).exec();
         return res.status(200).json({
             success : true,
             message : "Course Fetched Successfully",

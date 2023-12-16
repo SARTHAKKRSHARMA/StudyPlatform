@@ -36,7 +36,11 @@ exports.getAllCategories = async function(req, res)
 {
     try
     {
-        const categories = await Category.find({}, {name : true, description : true});
+        const categories = await Category.find({}, {name : true, description : true, courses : true}).populate({
+            path : "courses",
+            select : "status",
+            match : {status : "Published"}
+        }).exec();
         return res.status(200).json({
             success: true,
             message : "Successfully fetched all the categories",
@@ -65,8 +69,10 @@ exports.categoriesPageDetails = async function(req, res)
             })
         }
 
-
-        const allCourses = await Category.findById(categoryId).populate("courses").exec();
+        const allCourses = await Category.findById(categoryId).populate({
+            path : "courses",
+            match : {status : "Published"}
+        }).exec();
 
         if(!allCourses)
         {
@@ -82,7 +88,6 @@ exports.categoriesPageDetails = async function(req, res)
                     _id : {$ne : new mongoose.Types.ObjectId(categoryId)}
                 }
             },
-
             {
                 $lookup:{
                     from : Course.collection.name,
@@ -95,13 +100,22 @@ exports.categoriesPageDetails = async function(req, res)
                 $unwind : "$courseList"
             },
             {
-                $group : {
-                    _id : "$_id",
-                    topSelling : {$max : {$size : "$courseList.students"}}
+                $match : {
+                    "courseList.status" : "Published"
                 }
             },
             {
-                $sort : {topSelling : -1}
+                $group : {
+                    _id : "$_id",
+                    courseDetails: { $first: "$courseList" },
+                    topSelling : {$max : {_id : "$courseList._id", course : "$courseList" , studentCount : {$size : "$courseList.students"}}}
+                }
+            },
+            {
+                $sort : {"topSelling.studentCount" : -1}
+            },
+            {
+                $limit : 15
             }
         ]).exec();
 
@@ -123,23 +137,16 @@ exports.categoriesPageDetails = async function(req, res)
             {
                 $group : {
                     _id : "$courseList._id",
+                    courseDetails: { $first: "$courseList" },
                     studentsEnrolled : {$sum : {$size : '$courseList.students'}}
                 }
             },
             {
                 $sort : {studentEnrolled : -1}
             },
-            // {
-            //     $lookup : {
-            //         from : Course.collection.name,
-            //         localField : "_id",
-            //         foreignField : "_id",
-            //         as : "CourseDetails"
-            //     }
-            // },
-            // {
-            //     $unwind : "$CourseDetails"
-            // },
+            {
+                $limit : 15
+            }
         ]).exec()
 
         const topRated = await Category.aggregate([
@@ -171,26 +178,27 @@ exports.categoriesPageDetails = async function(req, res)
             {
                 $group : {
                     _id : "$courseList._id",
+                    courseDetails: { $first: "$courseList" },
                     averageRating : {$avg : '$ratingAndReviews.rating'}
                 }
             },
             {
                 $sort : {averageRating : -1}
             },
-
+            {
+                $limit : 15
+            }
         ]).exec();
 
 
         return res.status(200).json({
             success: true,
-            topRated,
-            mostSelling,
-            differentCategoryTopSellingCourse,
-            allCourses,
+            data : {topRated, mostSelling, differentCategoryTopSellingCourse : differentCategoryTopSellingCourse, allCourses : allCourses.courses},
             message : "Courses fetched successfully"
         })
     } catch(e)
     {
+        console.log(e);
         return res.status(500).json({
             success: false,
             error : e.message || "Internal Server Error"
