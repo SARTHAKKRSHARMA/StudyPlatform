@@ -53,6 +53,8 @@ const NestedView = ({handleChangeEditSectionName}) => {
         setLoading(false);
     }
 
+    console.log(course)
+
 
   return (
     <div className=' bg-richblack-700 w-[95%] mx-auto rounded-md px-2 py-3'>

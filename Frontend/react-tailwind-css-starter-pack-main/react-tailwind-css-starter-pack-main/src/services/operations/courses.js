@@ -341,20 +341,23 @@ export const getAllCourses = async () => {
   // delete a course
   export const deleteCourse = async (data, token) => {
     const toastId = toast.loading("Loading...")
+    let result;
     try {
-      const response = await apiConnector("DELETE", DELETE_COURSE_API, data, {
+      const response = await apiConnector("POST", DELETE_COURSE_API, data, {
         Authorization: `Bearer ${token}`,
       })
       console.log("DELETE COURSE API RESPONSE............", response)
       if (!response?.data?.success) {
         throw new Error("Could Not Delete Course")
       }
+      result = response?.data?.data;
       toast.success("Course Deleted")
     } catch (error) {
       console.log("DELETE COURSE API ERROR............", error)
       toast.error(error.message)
     }
     toast.dismiss(toastId)
+    return result;
   }
   
   // get full details of a course

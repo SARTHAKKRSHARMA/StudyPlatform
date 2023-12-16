@@ -18,6 +18,8 @@ const CourseBuilderForm = () => {
     const dispatch = useDispatch();
     const [loading, setLoading] = useState(false);
 
+    console.log(course);
+
     const goBack = (event) => {
         event.preventDefault();
         dispatch(setEditCourse(true));
