@@ -112,6 +112,13 @@ exports.categoriesPageDetails = async function(req, res)
                 }
             },
             {
+                $project: {
+                    _id: 0,
+                    courseDetails: "$topSelling.course",
+                    topSelling: 1
+                }
+            },
+            {
                 $sort : {"topSelling.studentCount" : -1}
             },
             {
@@ -135,6 +142,12 @@ exports.categoriesPageDetails = async function(req, res)
                 $unwind : "$courseList"
             },
             {
+                $match : {
+                    "courseList.status" : "Published"
+                }
+            },
+            
+            {
                 $group : {
                     _id : "$courseList._id",
                     courseDetails: { $first: "$courseList" },
@@ -142,7 +155,7 @@ exports.categoriesPageDetails = async function(req, res)
                 }
             },
             {
-                $sort : {studentEnrolled : -1}
+                $sort : {studentsEnrolled : -1}
             },
             {
                 $limit : 15
@@ -187,6 +200,20 @@ exports.categoriesPageDetails = async function(req, res)
             },
             {
                 $limit : 15
+            },
+            {
+                $group: {
+                    _id: null,
+                    topCourses: { $push: "$$ROOT" } // Group all courses into an array
+                }
+            },
+            {
+                $project: {
+                    _id: 0,
+                    topRatedCourse: {
+                        $arrayElemAt: ["$topCourses", 0] // Select the first course from the array
+                    }
+                }
             }
         ]).exec();
 

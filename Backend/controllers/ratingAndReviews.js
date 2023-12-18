@@ -93,6 +93,7 @@ exports.getAverageRating = async function(req, res)
             })
         }
 
+    
         const averageRating = await Course.aggregate([
             {
               $match: {
@@ -112,17 +113,18 @@ exports.getAverageRating = async function(req, res)
             },
             {
               $group: {
-                _id: null,
+                _id: new mongoose.Types.ObjectId(courseId),
                 averageValue: { $avg: "$ratingAndReviewsData.rating" },
                 },
             },
         ]);
 
 
-        let averageValue = "-";       
+        let averageValue = 0;       
         if (averageRating.length > 0) {
             averageValue = averageRating[0].averageValue;
         }
+
         return res.status(200).json({
             success : true,
             averageRating : averageValue

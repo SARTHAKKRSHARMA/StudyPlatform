@@ -119,17 +119,21 @@ exports.getCourseDetails = async function(req, res)
             })
         }
 
-        const course = await Course.findById(courseId).populate({
+        const course = await Course.findOne({_id : courseId, status : "Published"}).populate({
             path : "instructor",
-            populate : {path : "additionalDetails"}
+            populate : {path : "additionalDetails"},
         }).populate({
             path : "courseContent",
-            populate : { path : "subSection"}
+            populate : { 
+                path : "subSection",
+                select : "title description"
+            },
         }).populate({
             path : "ratingAndReviews",
             populate : { path : "user"}
         }).populate("category").exec();
 
+        console.log(course);
         return res.status(200).json({
             success: true,
             message : "Course Details Fetched Successfully.",
@@ -144,6 +148,69 @@ exports.getCourseDetails = async function(req, res)
         })
     }
 }
+
+exports.getCourseDetailsAuthenticated = async function(req, res)
+{
+    try
+    {
+        const {courseId} = req.body;
+        const userId = req.user.id;
+        const uid = new mongoose.Types.ObjectId(userId);
+        if(!courseId)
+        {
+            return res.status(400).json({
+                success: false,
+                message : "Please provide the course id to get details of that particular course."
+            })
+        }
+
+        const course = await Course.findOne({_id : courseId, status : "Published"});
+        if(!course)
+        {
+            return res.status(401).json({
+                success: false,
+                message : "You are not authorized to access this resource or the requested resource does not exist."
+            })
+        }
+
+        if(!course.students.includes(uid))
+        {
+            return res.status(402).json({
+                success:false,
+                message:"You are not enrolled in this course."
+            })
+        }
+
+
+        const populatedCourse = await Course.findOne({_id : courseId, status : "Published"}).populate({
+            path : "instructor",
+            populate : {path : "additionalDetails"},
+        }).populate({
+            path : "courseContent",
+            populate : { 
+                path : "subSection",
+            },
+        }).populate({
+            path : "ratingAndReviews",
+            populate : { path : "user"}
+        }).populate("category").exec();
+
+
+        return res.status(200).json({
+            success: true,
+            message : "Course Details Fetched Successfully.",
+            data : populatedCourse
+        })
+    } catch(e)
+    {
+        return res.status(500).json({
+            success: false,
+            message : "Can't fetch course details",
+            error : e.message || "Internal Server Error"
+        })
+    }
+}
+
 
 exports.editCourse = async function(req, res)
 {
