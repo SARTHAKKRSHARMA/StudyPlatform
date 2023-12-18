@@ -174,7 +174,7 @@ const CourseInformationForm = () => {
 
         <div className=' flex flex-col justify-between gap-2 relative'>
             <label htmlFor='courseShortDesc'>Course Description<sup className=' text-[#FF0000]'>*</sup></label>
-            <textarea placeholder='Enter Short Description' className=' appearance-none rounded-md  px-2 py-3 text-[16px] bg-richblack-800 outline-none' name='courseShortDesc' id='courseShortDesc' rows={4} {...register("courseShortDesc", {required : true, maxLength : { value : 120, message : "Max Length is 120 characters only"}})}></textarea>
+            <textarea placeholder='Enter Short Description' className=' appearance-none rounded-md  px-2 py-3 text-[16px] bg-richblack-800 outline-none' name='courseShortDesc' id='courseShortDesc' rows={4} {...register("courseShortDesc", {required : true, maxLength : { value : 1000, message : "Max Length is 1000 characters only"}})}></textarea>
             {
                 errors.courseShortDesc && (
                     <span className=' text-[12px] absolute -bottom-4 font-inter text-[#FF0000]'>Course Description is required Field</span>
@@ -240,7 +240,7 @@ const CourseInformationForm = () => {
 
         <div className=' flex flex-col justify-between gap-2 relative'>
             <label htmlFor='courseBenefits'>Benefits of the course<sup className=' text-[#FF0000]'>*</sup></label>
-            <textarea placeholder='Enter Course Benefits' className=' appearance-none rounded-md  px-2 py-3 text-[16px] bg-richblack-800 outline-none' name='courseBenefits' id='courseBenefits' rows={4} {...register("courseBenefits", {required : true, maxLength : { value : 120, message : "Max Length is 120 characters only"}})}></textarea>
+            <textarea placeholder='Enter Course Benefits' className=' appearance-none rounded-md  px-2 py-3 text-[16px] bg-richblack-800 outline-none' name='courseBenefits' id='courseBenefits' rows={4} {...register("courseBenefits", {required : true, maxLength : { value : 1000, message : "Max Length is 120 characters only"}})}></textarea>
             {
                 errors.courseBenefits && (
                     <span className=' text-[12px] absolute -bottom-4 font-inter text-[#FF0000]'>Course Benefits is required Field</span>

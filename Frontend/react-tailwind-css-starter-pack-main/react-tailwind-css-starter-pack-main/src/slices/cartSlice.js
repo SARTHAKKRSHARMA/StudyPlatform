@@ -13,12 +13,16 @@ export const cartSlice = createSlice({
     reducers: {
         addToCart : (state, action) => {
             state.items.push(action.payload);
+            state.totalItems += 1;
+            state.total += action.payload.price;
             toast.success("Item successfully added to Cart")
         },
         removeFromCart : (state, action) =>{ 
             let index = state.items.findIndex((item)=> item._id === action.payload);
             if(index !== -1) {
-                state.splice(index , 1);
+                state.totalItems -= 1;
+                state.total -= state.items[index].price;
+                state.items.splice(index , 1);
                 toast.success('Item removed from the Cart')
             } else {
                 toast.error("No such item in your cart");

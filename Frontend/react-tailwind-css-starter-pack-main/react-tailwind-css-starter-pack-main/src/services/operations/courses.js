@@ -25,33 +25,26 @@ const { GET_AVERAGE_RATING_API,
 
 export const getAverageRating = async function(courseId)
 {
+    let averageRating;
     try
     {
-        if(!courseId)
-        {
-            console.log("No valid course id provided");
-            throw new Error("No valid course id provided");
-        }
-
         const response = await apiConnector("POST", GET_AVERAGE_RATING_API, {courseId});
-        if(!response || !response?.data || response.status != 200 || !response?.success)
+        
+        console.log("Average Rating API response ",response);
+        if(!response || !response?.data || response.status !== 200 || !response?.data.success)
         {
             console.log("Error occured at backend");
             throw new Error("Error occured at backend");
         }
-
-        return {
-            success : true,
-            data : response.data
-        }
+        averageRating = response.data.averageRating;
     } catch(e)
     {
-        console.log(e.message);
-        return {
-            success : false,
-            data : e.message
-        }
+        console.log(e);
+        console.log("Error Occured in AVERAGE RATING API", e);
+        averageRating = "-";
     }
+
+    return averageRating;
 }
 
 export const getAllCourses = async () => {
@@ -84,7 +77,7 @@ export const getAllCourses = async () => {
       if (!response.data.success) {
         throw new Error(response.data.message)
       }
-      result = response.data
+      result = response.data.course
     } catch (error) {
       console.log("COURSE_DETAILS_API API ERROR............", error)
       result = error.response.data

@@ -65,8 +65,10 @@ const CoursesTable = ({courses, setCourses}) => {
                                 <Tr key={course._id} >
                                     <Td>
                                         <div className=' flex flex-row items-center gap-3'>
-                                            <img src={course.thumbnail} loading='lazy' width={220} height={150}  className=' w-[220px] h-[150px] rounded-lg object-cover'></img>     
-                                            <div className='  flex flex-col justify-between items-start h-[150px] py-3 w-[80%]'>
+                                            <div className=' w-[220px] h-[150px] flex flex-row items-center justify-center overflow-hidden rounded-md'>
+                                                <img src={course.thumbnail} loading='lazy' width={"100%"} height={"100%"} className=' rounded-md' />     
+                                            </div>
+                                            <div className='  flex flex-col gap-4 justify-between items-start min-h-[150px] h-fit py-3 w-[80%]'>
                                                 <div className=' flex flex-col gap-2'>
                                                     <p className=' text-richblack-100 text-[22px] font-semibold'>{course.courseName}</p>
                                                     <p className=' text-richblack-400'>{course.courseDescription.length > 30 ? course.courseDescription.slice(0, 30) + "..." : course.courseDescription}</p>

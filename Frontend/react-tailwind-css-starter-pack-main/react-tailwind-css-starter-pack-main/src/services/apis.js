@@ -5,19 +5,6 @@ export const categories = {
     CATEGORY_PAGE_DETAIL_API : BASE_URL + "/course/getCategoryPageDetails"
 }
 
-export const section = {
-    CREATE_SECTION_API : BASE_URL + "/course/addSection",
-    UPDATE_SECTION_API : BASE_URL + "/course/updateSection",
-    DELETE_SECTION_API : BASE_URL + "/course/deleteSection",
-}
-
-
-export const subsection = {
-    CREATE_SUBSECTION_API : BASE_URL + "/course/createSubsection",
-    UPDATE_SUBSECTION_API : BASE_URL + "/course/updateSubsection",
-    DELETE_SUBSECTION_API : BASE_URL + "/course/deleteSubSection",
-}
-
 export const course = {
     GET_ALL_COURSE_API: BASE_URL + "/course/getAllCourses",
     COURSE_DETAILS_API: BASE_URL + "/course/getCourseDetails",
@@ -33,7 +20,7 @@ export const course = {
     DELETE_SUBSECTION_API: BASE_URL + "/course/deleteSubsection",
     DELETE_COURSE_API: BASE_URL + "/course/deleteCourse",
     GET_FULL_COURSE_DETAILS_AUTHENTICATED:
-      BASE_URL + "/course/getFullCourseDetails",
+      BASE_URL + "/course/getCourseDetailsAuthenticated",
     LECTURE_COMPLETION_API: BASE_URL + "/course/updateCourseProgress",
     CREATE_RATING_API: BASE_URL + "/course/createRating",
     GET_AVERAGE_RATING_API : BASE_URL + "/course/getAverageRating",
@@ -61,5 +48,10 @@ export const authentication = {
 
 export const contactUs = {
     CONTACTUS_API: BASE_URL + '/contact/contactUs'
+}
+
+export const payment = {
+    CAPTURE_PAYMENT_API : BASE_URL + "/payment/capturePayment",
+    VERIFY_SIGNATURE : BASE_URL + "/payment/verifySignature"
 }
 

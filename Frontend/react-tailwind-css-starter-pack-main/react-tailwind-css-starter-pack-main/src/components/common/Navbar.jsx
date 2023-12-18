@@ -9,6 +9,7 @@ import {useSelector, useDispatch} from "react-redux"
 import { apiConnector } from '../../services/apiConnector';
 import { categories } from '../../services/apis';
 import { setLoading } from '../../slices/authSlice';
+import { logout } from '../../services/operations/auth';
 
 
 
@@ -27,6 +28,11 @@ const Navbar = () => {
       return matchPath(route, location.pathname);
   }
 
+
+  if((user && !token) || (token && !user))
+  {
+    dispatch(logout);
+  }
   const fetchSubLinks = async() => {
     setLoading(true);
     try
@@ -97,7 +103,7 @@ const Navbar = () => {
                 <Link to={"/dashboard/cart"} className='relative'>
                   <AiOutlineShoppingCart className=' text-white text-[1.3rem]' />
                   {
-                    (totalItems > 0) && <p className=' absolute -top-2 -right-3 text-white text-[11px]'>{totalItems}</p>
+                    (totalItems > 0) && <p className=' absolute -top-2 -right-2 text-white text-[11px]'>{totalItems}</p>
                   }
                 </Link>
               )

@@ -9,7 +9,7 @@ import { removeFromCart } from '../../../../slices/cartSlice';
 
 
 const RenderCartCourses = () => {
-    const {items} = useSelector(state => state.items);
+    const {items} = useSelector(state => state.cart);
     const [averageRating, setAverageRating] = useState({});
     const [loading, setLoading] = useState(false);
     const dispatch = useDispatch();

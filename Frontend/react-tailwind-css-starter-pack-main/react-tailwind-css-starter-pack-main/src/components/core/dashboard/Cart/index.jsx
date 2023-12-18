@@ -4,7 +4,9 @@ import RenderCartCourses from './RenderCartCourses';
 import RenderTotalAmount from './RenderTotalAmount';
 
 const Cart = () => {
-    const {totalItems, total} = useSelector(state => state.cart);
+    const {items, totalItems, total} = useSelector(state => state.cart);
+    console.log(items);
+    console.log(totalItems);
   return (
     <div>
         <h1>Your Cart</h1>
