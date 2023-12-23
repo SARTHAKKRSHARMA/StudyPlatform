@@ -4,8 +4,8 @@ const router = express.Router();
 const {createCourse, getAllCourses, getCourseDetails, editCourse, deleteCourse, getInstructorCourses, publishCourse, getCourseDetailsAuthenticated} = require("../controllers/course");
 const {createCategory, getAllCategories, categoriesPageDetails} = require("../controllers/categories");
 const {createSection, updateSection, deleteSection} = require("../controllers/sections");
-const {createSubSection, updateSubSection, deleteSubSection} = require("../controllers/subSection");
-const {createReview, getAverageRating, getAllRating, getAllRatingForACourse} = require("../controllers/ratingAndReviews");
+const {createSubSection, updateSubSection, deleteSubSection, markLectureComplete} = require("../controllers/subSection");
+const {createReview, getAverageRating, getAllRating, getAllRatingForACourse, getRatingByUserForACourse} = require("../controllers/ratingAndReviews");
 
 const {isAuthenticated, isInstructor, isStudent, isAdmin} = require("../middleware/auth");
 
@@ -24,13 +24,15 @@ router.get("/showAllCategories", getAllCategories);
 router.post("/getCategoryPageDetails", categoriesPageDetails);
 router.post("/createRating", isAuthenticated, isStudent, createReview);
 router.post("/getAverageRating", getAverageRating);
-router.post("/getReviews", getAllRating);
+router.get("/getReviews", getAllRating);
 router.post("/getAllRatingCourse", getAllRatingForACourse);
 router.post("/editCourse", isAuthenticated, editCourse);
 router.post("/deleteCourse", isAuthenticated, deleteCourse);
 router.post("/getInstructorCourses", isAuthenticated, getInstructorCourses);
 router.post("/publishCourse", isAuthenticated, publishCourse);
 router.post("/getCourseDetailsAuthenticated", isAuthenticated, isStudent, getCourseDetailsAuthenticated);
+router.post("/getReviewByUser", isAuthenticated, isStudent, getRatingByUserForACourse);
+router.post("/markLectureComplete", isAuthenticated, isStudent, markLectureComplete);
 
 
 

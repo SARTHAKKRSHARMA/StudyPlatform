@@ -164,57 +164,50 @@ exports.categoriesPageDetails = async function(req, res)
 
         const topRated = await Category.aggregate([
             {
-                $match:{_id : new mongoose.Types.ObjectId(categoryId)}  // filter by category id
+                $match: { _id: new mongoose.Types.ObjectId(categoryId) } // filter by category id
             },
             {
-                $lookup : {
-                    from : Course.collection.name,
-                    localField : "courses",
-                    foreignField : "_id",
-                    as : "courseList"
+                $lookup: {
+                    from: Course.collection.name,
+                    localField: "courses",
+                    foreignField: "_id",
+                    as: "courseList"
                 },
             },
             {
-                $unwind : "$courseList"
+                $unwind: "$courseList"
             },
             {
-                $lookup : {
-                    from : RatingAndReview.collection.name,
-                    localField : "courseList.ratingAndReviews",
-                    foreignField : "_id",
-                    as : "ratingAndReviews"
+                $lookup: {
+                    from: RatingAndReview.collection.name,
+                    localField: "courseList.ratingAndReviews",
+                    foreignField: "_id",
+                    as: "ratingAndReviews"
                 }
             },
             {
-                $unwind : "$ratingAndReviews"
-            },
-            {
-                $group : {
-                    _id : "$courseList._id",
-                    courseDetails: { $first: "$courseList" },
-                    averageRating : {$avg : '$ratingAndReviews.rating'}
-                }
-            },
-            {
-                $sort : {averageRating : -1}
-            },
-            {
-                $limit : 15
+                $unwind: "$ratingAndReviews"
             },
             {
                 $group: {
-                    _id: null,
-                    topCourses: { $push: "$$ROOT" } // Group all courses into an array
+                    _id: "$courseList._id",
+                    courseDetails: { $first: "$courseList" },
+                    averageRating: { $avg: '$ratingAndReviews.rating' }
                 }
             },
             {
                 $project: {
-                    _id: 0,
-                    topRatedCourse: {
-                        $arrayElemAt: ["$topCourses", 0] // Select the first course from the array
-                    }
+                    _id: 1,
+                    courseDetails: 1,
+                    averageRating: { $ifNull: ["$averageRating", 0] }
                 }
-            }
+            },
+            {
+                $sort: { averageRating: -1 }
+            },
+            {
+                $limit: 15
+            },
         ]).exec();
 
 

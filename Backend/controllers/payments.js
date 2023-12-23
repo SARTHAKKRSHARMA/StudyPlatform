@@ -1,5 +1,6 @@
 const instance = require("../config/razorpay");
 const Course = require("../models/course");
+const CourseProgress = require("../models/courseProgress");
 const User = require("../models/users");
 const mailSender = require("../utils/mailSender");
 const courseEnrollmentEmail = require("../mail/templates/courseEnrollmentEmail")
@@ -12,6 +13,7 @@ require("dotenv").config();
 exports.capturePayment = async function (req, res)
 {
     const {courses} = req.body;
+
     const userId = req.user.id;
     const uid = new mongoose.Types.ObjectId(userId);
 
@@ -28,6 +30,7 @@ exports.capturePayment = async function (req, res)
     let totalAmount = 0;
     for(const course_id of courses) 
     {
+        console.log("course id is", course_id);
         let course;
         try
         {
@@ -48,34 +51,35 @@ exports.capturePayment = async function (req, res)
                 message: e.message
             })
         }
+    }
 
-        try
-        {
-            var instance = new Razorpay({ key_id: process.env.RAZORPAY_KEY, key_secret: process.env.RAZORPAY_SECRET })
-            const order = await new instance.orders.create({
-                amount : totalAmount * 100,
-                currency : 'INR',
-                receipt :  (Math.random(Date.now())).toString(),
-            })
-
-            return res.status(200).json({
-                success: true,
-                data: order,
-                message: "Successfully created Order",
-                orderId : order.id,
-                courses : courses,
-                totalAmount,
-                key : process.env.RAZORPAY_KEY
+    try
+    {
+        var instance = new Razorpay({ key_id: process.env.RAZORPAY_KEY, key_secret: process.env.RAZORPAY_SECRET })
+        const order = await new instance.orders.create({
+            amount : totalAmount * 100,
+            currency : 'INR',
+            receipt :  (Math.random(Date.now())).toString(),
         })
-        } 
-        catch(e)
-        {
-            console.log(e);
-            return res.status(500).json({
-                success: false,
-                message : "Error occured while creating order"
-            })
-        }
+
+
+        return res.status(200).json({
+            success: true,
+            data: order,
+            message: "Successfully created Order",
+            orderId : order.id,
+            courses : courses,
+            totalAmount,
+            key : process.env.RAZORPAY_KEY
+    })
+    } 
+    catch(e)
+    {
+        console.log(e);
+        return res.status(500).json({
+            success: false,
+            message : "Error occured while creating order"
+        })
     }
 }
 
@@ -142,6 +146,7 @@ const enrollStudents = async(courses, userId, res) => {
     for(const course_id of courses)
     {
         const course = await Course.findByIdAndUpdate(course_id, {$push : {students : user._id}}, {new : true});
+        const courseProgress = await CourseProgress.create({course : course._id, user : user._id});
         if(!course) 
         {
             return res.status(500).json({
@@ -150,6 +155,7 @@ const enrollStudents = async(courses, userId, res) => {
             })
         }
         user.courses.push(course._id);
+        user.courseProgress.push(courseProgress._id);
 
     }
 

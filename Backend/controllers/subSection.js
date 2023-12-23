@@ -1,9 +1,11 @@
 const Section = require("../models/section");
 const SubSection = require("../models/subSection");
 const Course = require("../models/course")
+const CourseProgress = require("../models/courseProgress")
 const {imageUploader} = require("../utils/uploadImage");
 const {isFileIdentical} = require("../utils/identicalFileCheck");
 const {contentDestroyer} = require("../utils/uploadImage");
+const { default: mongoose } = require("mongoose");
 
 exports.createSubSection = async function(req, res)
 {
@@ -209,6 +211,78 @@ exports.deleteSubSection = async function(req, res)
         return res.status(500).json({
             success: false,
             message : e.message || "Internal Server Error",
+        })
+    }
+}
+
+exports.markLectureComplete = async function(req, res)
+{
+    try
+    {
+        const userId = req.user.id;
+        const uid = new mongoose.Types.ObjectId(userId);
+        const {courseId, subSectionId} = req.body;
+        const ssid = new mongoose.Types.ObjectId(subSectionId);
+
+        if(!courseId || !subSectionId)
+        {
+            return res.status(400).json({
+                success: false,
+                message: "Please provide course and sub-section ids!"
+            })
+        }
+
+        const course = await Course.findById(courseId).populate({
+            path : "courseContent",
+            select : "subSection",
+            id : false
+        });
+
+        let lectureExistInGivenCourse = false;
+        course.courseContent.forEach((section) => {
+            if(section.subSection.includes(ssid))
+            {
+                lectureExistInGivenCourse = true;
+                return;
+            }
+        })
+        if(!lectureExistInGivenCourse)
+        {
+            return res.status(402).json({
+                success: false,
+                message: `Sub Section does not belong to this course`
+            })
+        }
+        if(!course.students.includes(uid))
+        {
+            return res.status(401).json({
+                success: false,
+                message: "You are not enrolled in this course!"
+            })
+        }
+
+        const courseProgress = await CourseProgress.findOne({user : userId, course : courseId});
+        if(courseProgress.completedVideos.includes(ssid))
+        {
+            return res.status(401).json({
+                success: false,
+                message: "This video has already been completed"
+            })
+        }
+        courseProgress.completedVideos.push(subSectionId);
+        await courseProgress.save();
+
+        return res.status(200).json({
+            success:true,
+            message:"Video Marked as completed successfully",
+            data : courseProgress
+        })
+    } catch(e)
+    {
+        console.log(e);
+        return res.status(500).json({
+            success : false,
+            message : e.message || "Internal Server Error"
         })
     }
 }

@@ -1,6 +1,9 @@
 const User = require("../models/users");
 const Profile = require("../models/profile");
+const Course = require("../models/course");
+const CourseProgress = require("../models/courseProgress")
 const {imageUploader, contentDestroyer} = require("../utils/uploadImage");
+const Section = require("../models/section")
 const { default: mongoose } = require("mongoose");
 
 exports.updateProfile = async function(req, res)
@@ -139,8 +142,81 @@ exports.getEnrolledCourses = async function(req, res)
             })
         }
 
-        const user = await User.findById(userId).populate("courses");
-        if (!user)
+        const enrolledCourses = await User.aggregate([
+            {
+              $match: {
+                _id: new mongoose.Types.ObjectId(req.user.id),
+              },
+            },
+            {
+              $lookup: {
+                from: Course.collection.name,
+                localField: "courses",
+                foreignField: "_id",
+                as: "courseList",
+              },
+            },
+            {
+              $unwind: "$courseList",
+            },
+            {
+              $lookup: {
+                from: Section.collection.name,
+                localField: "courseList.courseContent",
+                foreignField: "_id",
+                as: "courseSection",
+              },
+            },
+            {
+              $unwind: {
+                path: "$courseSection",
+              },
+            },
+            {
+              $lookup: {
+                from: CourseProgress.collection.name,
+                localField: "courseList._id",
+                foreignField: "course",
+                as: "courseProgress",
+              },
+            },
+            {
+              $unwind: {
+                path: "$courseProgress",
+              },
+            },
+            {
+              $group: {
+                _id: "$courseList._id",
+                courseName: { $first: "$courseList.courseName" },
+                courseThumbnail: { $first: "$courseList.thumbnail" },
+                courseDescription: { $first: "$courseList.courseDescription" },
+                completedVideos: { $first: { $size: "$courseProgress.completedVideos" } },
+                uniqueVideos: { $addToSet: "$courseSection.subSection" },
+                firstSection : {$first : "$courseSection"}
+              },
+            },
+            {
+              $unwind: "$uniqueVideos",
+            },
+            {
+              $unwind: "$uniqueVideos",
+            },
+            {
+              $group: {
+                _id: "$_id",
+                courseName: { $first: "$courseName" },
+                courseThumbnail: { $first: "$courseThumbnail" },
+                courseDescription: { $first: "$courseDescription" },
+                completedVideos: { $first: "$completedVideos" },
+                firstSection : {$first : "$firstSection"},
+                totalVideos: { $sum: 1 },
+              },
+            },
+          ]).exec();
+
+
+        if (!enrolledCourses)
         {
             return res.status(404).json({
                 success : false,
@@ -150,10 +226,11 @@ exports.getEnrolledCourses = async function(req, res)
 
         return res.status(200).json({
             success : true,
-            data : user.courses
+            data : enrolledCourses
         })
     } catch(e)
     {
+        console.log(e);
         return res.status(500).json({
             success: false,
             message: e.message,
@@ -203,6 +280,40 @@ exports.updateDisplayPicture = async function (req, res)
         return res.status(500).json({
             success: false,
             message: e.message,
+        })
+    }
+}
+
+exports.instructorDashboard = async function (req, res) 
+{
+    try
+    {
+        const courseDetails = await Course.find({instructor : req.user.id});
+        const courseData = courseDetails.map((course) => {
+            const totalStudentEnrolled = course.students.length;
+            const totalAmountGenerated = course.price * totalStudentEnrolled;
+            const courseDataWithStats = {
+                _id : course._id,
+                courseName  : course.courseName,
+                courseDescription : course.courseDescription,
+                totalAmountGenerated,
+                totalStudentEnrolled,
+            }
+
+            return courseDataWithStats;
+        })
+
+        return res.status(200).json({
+            success : true,
+            data : courseData
+        })
+        
+    } catch(e)
+    {
+        console.log(e);
+        return res.status(500).json({
+            success : false,
+            message : e.message || "Internal Server Error" 
         })
     }
 }

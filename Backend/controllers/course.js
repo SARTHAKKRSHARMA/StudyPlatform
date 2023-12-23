@@ -1,5 +1,6 @@
 const Course = require("../models/course");
 const Categories = require("../models/category");
+const CourseProgress = require("../models/courseProgress")
 const User = require("../models/users");
 const {imageUploader} = require("../utils/uploadImage");
 const { default: mongoose } = require("mongoose");
@@ -181,6 +182,7 @@ exports.getCourseDetailsAuthenticated = async function(req, res)
             })
         }
 
+        const courseProgress = await CourseProgress.findOne({course : course._id, user : userId});
 
         const populatedCourse = await Course.findOne({_id : courseId, status : "Published"}).populate({
             path : "instructor",
@@ -195,11 +197,10 @@ exports.getCourseDetailsAuthenticated = async function(req, res)
             populate : { path : "user"}
         }).populate("category").exec();
 
-
         return res.status(200).json({
             success: true,
             message : "Course Details Fetched Successfully.",
-            data : populatedCourse
+            data : {populatedCourse, courseProgress},
         })
     } catch(e)
     {

@@ -34,7 +34,9 @@ exports.createReview = async function(req, res)
             });
         }
 
-        const course = await Course.findById(courseId).populate("ratingAndReviews", "user").exec();
+        const course = await Course.findById(courseId).populate({
+            path : "ratingAndReviews", 
+            select : "user"}).exec();
 
         if (!course)
         {
@@ -60,7 +62,7 @@ exports.createReview = async function(req, res)
             })
         }
 
-        const ratingAndReview = await RatingAndReviews.create({user : userId, rating, review});
+        const ratingAndReview = await RatingAndReviews.create({user : userId, course : courseId, rating, review});
         course.ratingAndReviews.push(ratingAndReview._id);
         await course.save();
 
@@ -143,19 +145,20 @@ exports.getAllRating = async function(req, res)
 {
     try
     {
-        const course = await Course.find().select("courseName").populate({
-            path: 'ratingAndReviews',
-            populate : {
-                        path : "user",
-                        select : "firstName lastName email image"
-                    },
-        }).sort({'ratingAndReviews.rating' : 'desc'}).exec();
+        const reviews = await RatingAndReviews.find().populate({
+            path : "course",
+            select : "courseName"
+        }).populate({
+            path : "user",
+            select : "firstName lastName email image"
+        }).sort({rating : "desc"}).limit(15).exec();
+
         
 
         return res.status(200).json({
             success : true,
             message : "Reviews fetched Successfully",
-            reviews : course
+            reviews 
         })
     } catch(e)
     {
@@ -194,6 +197,45 @@ exports.getAllRatingForACourse = async function(req, res)
         return res.status(500).json({
             success : false,
             error : e.message || 'Error occurred while fetching reviews.'
+        })
+    }
+}
+
+
+exports.getRatingByUserForACourse = async function(req, res)
+{
+    try
+    {
+        const userId = req.user.id;
+        const {courseId} = req.body;
+        if(!courseId)
+        {
+            return res.status(400).json({
+                success : false,
+                error : "Course ID is missing."
+            })
+        }
+
+        const review = await RatingAndReviews.findOne({user : userId, course : courseId});
+        if(!review)
+        {
+            return res.status(404).json({
+                success : false,
+                error : `No rating found for the user on this course.`
+            })
+        }
+
+        return res.status(200).json({
+            success : true,
+            data : review
+        })
+
+    } catch(e)
+    {
+        console.log(e);
+        return res.status(500).json({
+            success:false,
+            error : e.toString() || "Internal Server Error"
         })
     }
 }
