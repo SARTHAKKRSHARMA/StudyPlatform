@@ -6,7 +6,7 @@ require("dotenv").config();
 const userRoutes = require("./routes/User");
 const profileRoutes = require("./routes/Profile");
 const paymentRoutes = require("./routes/Payments");
-const courseRoutes s= require("./routes/Course");
+const courseRoutes = require("./routes/Course");
 const contactUsRoutes = require("./routes/ContactUs");
 
 const dbConnect = require("./config/database");
