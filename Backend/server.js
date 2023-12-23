@@ -20,12 +20,12 @@ dbConnect();
 
 app.use(express.json());
 app.use(cookieParser());
-app.use(
-	cors({
-		origin:"https://study-platform-nxtms5j9x-sarthakkrsharmas-projects.vercel.app/",
-		credentials:true,
-	})
-)
+// app.use(
+// 	cors({
+// 		origin:"https://study-platform-nxtms5j9x-sarthakkrsharmas-projects.vercel.app/",
+// 		credentials:true,
+// 	})
+// )
 app.use(fileUpload({
     useTempFiles : true,
     tempFileDir : '/tmp/'
