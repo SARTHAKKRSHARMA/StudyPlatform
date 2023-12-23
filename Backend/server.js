@@ -22,7 +22,7 @@ app.use(express.json());
 app.use(cookieParser());
 app.use(
 	cors({
-	  origin: "https://study-platform-hla7vgoqx-sarthakkrsharmas-projects.vercel.app",
+	  origin: "https://study-platform-dun.vercel.app/",
 	  credentials: true,
 	})
   );
