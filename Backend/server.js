@@ -6,7 +6,7 @@ require("dotenv").config();
 const userRoutes = require("./routes/User");
 const profileRoutes = require("./routes/Profile");
 const paymentRoutes = require("./routes/Payments");
-const courseRoutes = require("./routes/Course");
+const courseRoutes s= require("./routes/Course");
 const contactUsRoutes = require("./routes/ContactUs");
 
 const dbConnect = require("./config/database");
@@ -22,7 +22,7 @@ app.use(express.json());
 app.use(cookieParser());
 app.use(
 	cors({
-	  origin: "https://study-platform-dun.vercel.app",
+	  origin: "https://study-platform-hla7vgoqx-sarthakkrsharmas-projects.vercel.app",
 	  credentials: true,
 	})
   );
