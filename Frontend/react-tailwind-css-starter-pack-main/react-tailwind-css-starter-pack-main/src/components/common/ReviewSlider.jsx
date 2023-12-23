@@ -35,7 +35,7 @@ const ReviewSlider = () => {
                 }}
         >
             {
-                reviews.length !== 0 && reviews.map((review) => {
+                (reviews && reviews.length !== 0) && reviews.map((review) => {
                     return (
                         <SwiperSlide key={review._id} className=' flex flex-row items-center justify-center'>
                             <div className=' bg-richblack-700 rounded-md min-w-[250px] h-[100%] w-fit px-3 py-4 flex flex-col gap-3'>
