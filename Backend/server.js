@@ -10,7 +10,6 @@ const contactUsRoutes = require("./routes/ContactUs");
 
 const dbConnect = require("./config/database");
 const cookieParser = require("cookie-parser");
-const cors = require("cors");
 const fileUpload = require("express-fileupload");
 const cloudinaryConnect = require("./config/cloudinary");
 
@@ -20,19 +19,7 @@ dbConnect();
 
 app.use(express.json());
 app.use(cookieParser());
-app.use(function (req, res, next) {
-    // Enabling CORS
-    res.header("Access-Control-Allow-Origin", "*");
-    res.header("Access-Control-Allow-Methods", "GET,HEAD,OPTIONS,POST,PUT");
-    res.header("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept, x-client-key, x-client-token, x-client-secret, Authorization");
 
-    // Handle preflight request
-    if (req.method === 'OPTIONS') {
-        return res.status(200).end();
-    }
-
-    next();
-});
 app.use(fileUpload({
     useTempFiles : true,
     tempFileDir : '/tmp/'
