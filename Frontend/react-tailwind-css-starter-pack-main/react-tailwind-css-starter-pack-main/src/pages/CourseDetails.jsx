@@ -152,7 +152,7 @@ const CourseDetails = () => {
                         {
                             (user && user?.accountType !== "Instructor") ? coursePurchased ? (
                                 <div>
-                                    <button disabled={paymentLoading} className=' text-richblack-900 bg-yellow-100 px-3 py-2 rounded-md w-[100%] flex items-center justify-center font-semibold'>Start Learning</button>
+                                    <button onClick={() => navigate(`/view-course/${course?._id}/section/${course?.courseContent?.[0]?._id}/sub-section/${course?.courseContent?.[0]?.subSection?.[0]?._id}`)} disabled={paymentLoading} className=' text-richblack-900 bg-yellow-100 px-3 py-2 rounded-md w-[100%] flex items-center justify-center font-semibold'>Start Learning</button>
                                 </div>
                             ) : addedToCart ? (
                                 <div className=' flex flex-col gap-3'>

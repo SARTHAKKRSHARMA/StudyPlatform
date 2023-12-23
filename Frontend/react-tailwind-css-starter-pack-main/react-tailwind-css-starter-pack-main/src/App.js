@@ -20,6 +20,10 @@ import AddCourse from "./components/core/dashboard/AddCourse";
 import MyCourses from "./components/core/dashboard/MyCourses";
 import Catalog from "./pages/Catalog";
 import CourseDetails from "./pages/CourseDetails";
+import ViewCourse from "./pages/ViewCourse";
+import VideoDetails from "./components/core/viewCourse/VideoDetails";
+import Instructor from "./components/core/instructorDashboard/Instructor";
+import Contact from "./pages/Contact";
 
 function App() {
   const {user} = useSelector(state => state.profile);
@@ -32,6 +36,7 @@ function App() {
         <Route path="/login" element={<OpenRoute><Login /></OpenRoute>} />
         <Route path="/signup" element={<OpenRoute><Signup /></OpenRoute>} />
         <Route path="/error" element={<Error />} />
+        <Route path="/contact" element={<Contact />} />
         <Route path="/forgot-password" element={<OpenRoute><ForgotPassword /></OpenRoute>} />
         <Route path="/update-password/:resetPasswordToken" element={<OpenRoute><UpdatePassword /></OpenRoute> } />
         <Route path="/verification-email" element={<VerifyEmail />} />
@@ -44,7 +49,7 @@ function App() {
           {
             user?.accountType === "Instructor" && (
               <>
-                <Route path="/dashboard/instructor" element={<div className=" text-white">Instructor</div>}/>
+                <Route path="/dashboard/instructor" element={<Instructor />}/>
                 <Route path="/dashboard/my-courses" element={<MyCourses />}/>
                 <Route path="/dashboard/add-course" element={<AddCourse />}/>
               </>
@@ -64,7 +69,17 @@ function App() {
         </Route>
         <Route path={`/catalog/:categoryName`} element={<Catalog />} />
         <Route path="/course/:courseId" element={<CourseDetails />} />
+        <Route element={<PrivateRoute><ViewCourse /></PrivateRoute>}>
+            {
+              user?.accountType === "Student" && (
+                <>
+                  <Route path={"view-course/:courseId/section/:sectionId/sub-section/:subSectionId"} element={<VideoDetails />}  />
+                </>
+              )
+            }
+        </Route>
       </Routes>
+
     </div>
   );
 }

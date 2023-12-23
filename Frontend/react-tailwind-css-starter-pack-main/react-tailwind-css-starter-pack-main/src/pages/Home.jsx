@@ -9,6 +9,7 @@ import TimelineSection from '../components/core/homepage/TimelineSection';
 import LearningLanguageSection from '../components/core/homepage/LearningLanguage';
 import PowerOfCode from '../components/core/homepage/PowerOfCode';
 import Instructor from "../assets/Images/Instructor.png"
+import ReviewSlider from '../components/common/ReviewSlider';
 
 const Home = () => {
   return (
@@ -166,6 +167,9 @@ const Home = () => {
         </div>
 
         {/* section4 */}
+        <div>
+            <ReviewSlider />
+        </div>
     </div>
   )
 }

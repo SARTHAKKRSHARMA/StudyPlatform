@@ -2,10 +2,14 @@ import React, { useEffect, useState } from 'react'
 import {Outlet, useParams} from "react-router-dom"
 import {useSelector, useDispatch} from "react-redux"
 import { getFullDetailsOfCourse } from '../services/operations/courses';
-import { setCourseSectionData, setEntireCourseData } from '../slices/viewCourseSlice';
+import { setCompletedLecture, setCourseSectionData, setEntireCourseData, setTotalNumberOfLecture } from '../slices/viewCourseSlice';
+import toast from 'react-hot-toast';
+import VideoDetailsSidebar from '../components/core/viewCourse/VideoDetailsSidebar';
+import ReviewModal from '../components/core/viewCourse/ReviewModal';
 
 const ViewCourse = () => {
     const  {token} = useSelector(state => state.auth);
+    const {user} = useSelector(state => state.profile);
     const {courseId} = useParams();
     const dispatch = useDispatch();
     const [reviewModal, setReviewModal] = useState(null);
@@ -18,16 +22,30 @@ const ViewCourse = () => {
             const result = await getFullDetailsOfCourse(courseId, token);
             if(result)
             {
-                dispatch(setCourseSectionData(result.courseContent));
-                dispatch(setEntireCourseData(result));
-                dispatch()
+                dispatch(setCourseSectionData(result?.populatedCourse?.courseContent));
+                dispatch(setEntireCourseData(result?.populatedCourse));
+                dispatch( setCompletedLecture(result?.courseProgress?.completedVideos));
+                let lectures = 0;
+                result?.populatedCourse?.courseContent.forEach((section) => lectures += section?.subSection?.length)
+                dispatch(setTotalNumberOfLecture(lectures));
             }
+            else
+            {
+                toast.error("Failed to load course details");
+            }
+            setLoading(false);
         }
-    })
+        fetchCompleteCourseDetails();
+    }, [])
+
+    if(loading)
+    {
+        return <div className=' spinner relative top-[50%] left-[50%]'></div>
+    }
 
 
   return (
-    <div>
+    <div className=' flex flex-row'>
         <VideoDetailsSidebar setReviewModal={setReviewModal} />
         
         <div>
@@ -35,7 +53,7 @@ const ViewCourse = () => {
         </div>
 
         {
-            reviewModal && <CourseReviewModal setReviewModal={setReviewModal} />
+            reviewModal && <ReviewModal setReviewModal={setReviewModal} />
         }
     </div>
   )

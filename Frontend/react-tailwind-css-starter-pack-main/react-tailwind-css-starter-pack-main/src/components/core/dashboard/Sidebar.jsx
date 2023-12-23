@@ -6,6 +6,8 @@ import { Link, NavLink, matchPath, useLocation, useNavigate } from 'react-router
 import { VscAccount, VscDashboard, VscVm, VscAdd, VscMortarBoard, VscHistory, VscSettingsGear } from 'react-icons/vsc'
 import ConfirmationModal from '../../common/ConfirmationModal'
 import { IoLogOutOutline } from "react-icons/io5";
+import { IoCart } from "react-icons/io5";
+
 
 
 
@@ -50,7 +52,7 @@ const Sidebar = () => {
                     { link.icon === "VscVm" && <VscVm  />}
                     { link.icon === "VscAdd" && <VscAdd  />}
                     { link.icon === "VscMortarBoard" && <VscMortarBoard  />}
-                    { link.icon === "VscHistory" && <VscHistory  />}
+                    { link.icon === "IoCart" && <IoCart  />}
                     { <Link to={link?.path} >{link?.name}</Link>    }
                 </div>
             })

@@ -19,7 +19,9 @@ const { GET_AVERAGE_RATING_API,
     GET_FULL_COURSE_DETAILS_AUTHENTICATED,
     LECTURE_COMPLETION_API,
     CREATE_RATING_API,
-    PUBLISH_COURSE_API
+    PUBLISH_COURSE_API,
+    GET_REVIEW_BY_USER_API,
+    GET_ALL_RATING
      } = course;
 
 
@@ -403,7 +405,7 @@ export const getAllCourses = async () => {
         throw new Error(response.data.error)
       }
       toast.success("Lecture Completed")
-      result = true
+      result = response?.data?.data?.completedVideos
     } catch (error) {
       console.log("MARK_LECTURE_AS_COMPLETE_API API ERROR............", error)
       toast.error(error.message)
@@ -437,3 +439,41 @@ export const getAllCourses = async () => {
   }
 
 
+  export const getRatingByUserForACourse = async (data, token) => {
+    const toastId = toast.loading("Loading...")
+    let result = {rating : -1, review : ""};
+    try {
+      const response = await apiConnector("POST", GET_REVIEW_BY_USER_API, data, {
+        Authorization: `Bearer ${token}`,
+      })
+      console.log("Fetching Rating From User RATING API RESPONSE............", response)
+      if (!response?.data?.success) {
+        throw new Error("Could Not Fetch Rating")
+      }
+      result.rating = response?.data?.data?.rating
+      result.review = response?.data?.data?.review
+    } catch (error) {
+      console.log("CREATE RATING API ERROR............", error)
+    }
+    toast.dismiss(toastId)
+    return result;
+  }
+
+
+  export const fetchAllReviews = async() => {
+    let result = null
+    try
+    {
+      const response = await apiConnector("GET", GET_ALL_RATING);
+      console.log(response.data);
+      if(!response?.data?.success)
+      {
+        throw new Error("Error occured while processing request");
+      }
+      result = response?.data?.reviews;
+    } catch(e)
+    {
+      toast.error("Failed to fetch Reviews");
+    }
+    return result;
+  }

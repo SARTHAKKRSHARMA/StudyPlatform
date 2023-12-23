@@ -20,7 +20,7 @@ const CourseSlider = ({courses}) => {
             <SwiperSlide key={index} >
                 {
                   <div onClick={() => navigate(`/course/${course.courseDetails._id}`)} className=' flex flex-col w-[100%] h-[100%] cursor-pointer'>
-                    <img src={course.courseDetails.thumbnail} className='  w-full h-[200px]  object-cover' />
+                    <img src={course?.courseDetails?.thumbnail} className='  w-full h-[200px]  object-cover' />
                     <div className=' flex flex-col items-start justify-between'>
                       <p className=' text-richblack-25'>{course.courseDetails.courseName}</p>
                       <p className=' text-richblack-300 text-[14px]'>{course.courseDetails.ratingAndReviews.length} Reviews</p>

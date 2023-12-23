@@ -91,7 +91,7 @@ export async function verifyPayment(bodyData, token, navigate, dispatch) {
         console.log(response);
         dispatch(setUser(response.data.user));
         toast.success("Payment Successfull, you're added to the course");
-        // navigate("/dashboard/enrolled-courses");
+        navigate("/dashboard/enrolled-courses");
         dispatch(resetCart());
     } catch(e)
     {

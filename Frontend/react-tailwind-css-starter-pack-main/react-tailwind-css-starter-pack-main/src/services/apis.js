@@ -21,10 +21,12 @@ export const course = {
     DELETE_COURSE_API: BASE_URL + "/course/deleteCourse",
     GET_FULL_COURSE_DETAILS_AUTHENTICATED:
       BASE_URL + "/course/getCourseDetailsAuthenticated",
-    LECTURE_COMPLETION_API: BASE_URL + "/course/updateCourseProgress",
+    LECTURE_COMPLETION_API: BASE_URL + "/course/markLectureComplete",
     CREATE_RATING_API: BASE_URL + "/course/createRating",
     GET_AVERAGE_RATING_API : BASE_URL + "/course/getAverageRating",
-    PUBLISH_COURSE_API : BASE_URL + "/course/publishCourse"
+    PUBLISH_COURSE_API : BASE_URL + "/course/publishCourse",
+    GET_REVIEW_BY_USER_API : BASE_URL + "/course/getReviewByUser",
+    GET_ALL_RATING : BASE_URL + "/course/getReviews"
   }
 
 
@@ -32,7 +34,8 @@ export const course = {
 
 export const profile = {
     GET_PROFILE : BASE_URL + "/profile/getUserDetails",
-    GET_ENROLLED_COURSES : BASE_URL + "/profile/enrolledCourses"
+    GET_ENROLLED_COURSES : BASE_URL + "/profile/enrolledCourses",
+    GET_DASHBOARD_API  : BASE_URL + "/profile/instructorDashboard"
 }
 
 

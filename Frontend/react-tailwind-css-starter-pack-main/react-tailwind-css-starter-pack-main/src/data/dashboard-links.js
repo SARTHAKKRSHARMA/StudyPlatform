@@ -35,9 +35,9 @@ export const sidebarLinks = [
   },
   {
     id: 6,
-    name: "Purchase History",
-    path: "/dashboard/purchase-history",
+    name: "Wishlist",
+    path: "/dashboard/cart",
     type: "Student",
-    icon: "VscHistory",
+    icon: "IoCart",
   },
 ];

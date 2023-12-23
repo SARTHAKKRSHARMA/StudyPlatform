@@ -1,7 +1,7 @@
 import {profile} from "../apis"
 import { apiConnector } from "../apiConnector";
 import toast from "react-hot-toast";
-const {GET_PROFILE, GET_ENROLLED_COURSES} = profile;
+const {GET_PROFILE, GET_ENROLLED_COURSES, GET_DASHBOARD_API} = profile;
 
 export const getProfile = async function(token, setLoading) {
     const toastId = toast.loading("Fetching Profile Data");
@@ -40,12 +40,11 @@ export const getProfile = async function(token, setLoading) {
 }
 
 
-export const getEnrolledCourses = async (token, setLoading) =>
+export const getEnrolledCourses = async (token) =>
 {
     const toastId = toast.loading("Fetching Course List");
     try
     {
-        setLoading(true);
         if(!token)
         {
             console.log("Kindly send a valid token");
@@ -59,7 +58,6 @@ export const getEnrolledCourses = async (token, setLoading) =>
         }
         toast.dismiss(toastId);
         toast.success("Course List Fetched Successfully");
-        setLoading(false);
         return {
             success : true,
             data : response.data.data
@@ -68,7 +66,6 @@ export const getEnrolledCourses = async (token, setLoading) =>
     {
         toast.dismiss(toastId);
         toast.error("Error occurred while fetching course");
-        setLoading(false);
         console.log("Error faced while processing request");
         console.log(e);
         return {
@@ -77,4 +74,28 @@ export const getEnrolledCourses = async (token, setLoading) =>
             data : e?.message
         }
     }   
+}
+
+export const getInstructorDashboard = async(token) => {
+    const toastId = toast.loading("Fetching Dashboard Data");
+    let result = [];
+    try
+    {
+        const response = await apiConnector("POST", GET_DASHBOARD_API, null, {
+            "Authorization" : `Bearer ${token}`
+        });
+        console.log("GET INSTRUCTOR DASHBOARD API", response);
+        if(!response?.data?.success)
+        {
+            throw new Error("Error occured while fetching dashboard data");
+        } 
+        toast.success("Dashboard Data fetched successfully");
+        result = response?.data?.data;
+    } catch(e)
+    {
+        toast.error("Failed to fetch dashboard data");
+    }
+
+    toast.dismiss(toastId);
+    return result;
 }

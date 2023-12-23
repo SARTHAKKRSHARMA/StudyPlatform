@@ -38,7 +38,7 @@ const ContactUsForm = () => {
     }
 
   return (
-        <form onSubmit={handleSubmit(submitContactForm)} className=' w-[40%] max-w-[1080px] flex flex-col items-center justify-center mb-3 gap-4'>
+        <form onSubmit={handleSubmit(submitContactForm)} className='  max-w-[1080px] flex flex-col items-center justify-center mb-3 gap-4'>
         <div className=' flex flex-row items-center justify-between w-[100%] mb-2'>
             <div className=' flex flex-col gap-2 w-[49%] relative'>
                 <label htmlFor="firstName" className=' text-white'>First Name</label>
